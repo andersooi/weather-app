@@ -5,15 +5,29 @@ function App() {
 
   const [data, setData] = useState({})
   const [location, setLocation] = useState('')
+  const [error, setError] = useState(null)
+  const [isValid, setIsValid] = useState(true)
 
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=b2e213fcc0ea00d85d879e4fffca40ee`
 
   const searchLocation = (event) => {
     if (event.key === 'Enter') {
+      if (!location) {
+        setError('Input a valid location')
+        setIsValid(false)
+        return;
+      }
       axios.get(url).then((response) => {
         setData(response.data)
+        setError(null)
+        setIsValid(true)
         console.log(response.data)
       })
+        .catch((error) => {
+          setError('Invalid location')
+          setIsValid(false)
+          console.log(error)
+        })
       setLocation('')
     }
   }
@@ -25,7 +39,7 @@ function App() {
         value={location}
         onChange={event => setLocation(event.target.value)}
         onKeyPress={searchLocation}
-        placeholder='Enter Location'
+        placeholder={isValid ? 'Enter Location' : error}
         type='text'/>
       </div>
       <div className="container">
